@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Monitor</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Network Monitor</h1>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card metric-latency">
+          <div class="metric-header">
+            <span class="metric-title">Latency</span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="latency">0</span>
+            <span class="metric-unit">ms</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-jitter">
+          <div class="metric-header">
+            <span class="metric-title">Jitter</span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="jitter">0</span>
+            <span class="metric-unit">ms</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-packetloss">
+          <div class="metric-header">
+            <span class="metric-title">Packet Loss</span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="packetLoss">0</span>
+            <span class="metric-unit">%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="graph-container">
+          <canvas id="latencyGraph"></canvas>
+        </div>
+        <div class="spikes-container">
+          <h2>Last Spikes</h2>
+          <div id="lastSpikesCards">
+            <!-- Spike cards will be dynamically added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-button">
+      <button id="openSettings" class="macos-button">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <script src="eel.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+  </body>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button id="closeSettings" class="close-button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-item">
+          <label for="pingInterval">Ping Interval (ms):</label>
+          <input
+            type="number"
+            id="pingInterval"
+            min="100"
+            max="2000"
+            step="100"
+            value="200"
+          />
+        </div>
+        <div class="setting-actions">
+          <button id="saveSettings" class="save-button">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>
