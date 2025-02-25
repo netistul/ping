@@ -2,18 +2,53 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Network Monitor</title>
+    <meta
+      name="viewport"
+      content="width=1050, height=630, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <div class="pywebview-drag-region">
+      <span class="window-title">Network Monitor</span>
+      <div class="window-controls">
+        <button
+          class="window-control-button minimize-button"
+          onclick="minimizeWindow()"
+        ></button>
+        <button
+          class="window-control-button maximize-button"
+          onclick="toggleMaximize()"
+        ></button>
+        <button
+          class="window-control-button close-button"
+          onclick="closeWindow()"
+        ></button>
+      </div>
+    </div>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
-      <div class="header">
-        <h1>Network Monitor</h1>
+      <div class="header"></div>
+
+      <div class="monitoring-status">
+        <div class="status-dot"></div>
+        <span id="elapsed-time">just started</span>
       </div>
 
       <div class="metrics-grid">
         <div class="metric-card metric-latency">
+          <div class="tooltip">
+            <strong class="tooltip-title">Latency (Ping)</strong><br />
+            <span class="metric-description"
+              >Measures the time it takes for data to travel from your device to
+              the server and back.</span
+            ><br /><br />
+            <strong class="tooltip-title">Ranges:</strong><br />
+            <span class="range excellent">&lt;20ms: Excellent</span><br />
+            <span class="range good">20-100ms: Good</span><br />
+            <span class="range fair">100-200ms: Fair</span><br />
+            <span class="range poor">>200ms: Poor</span><br /><br />
+            Lower values indicate better network performance.
+          </div>
           <div class="metric-header">
             <span class="metric-title">Latency</span>
             <span class="metric-avg">avg: --</span>
@@ -25,6 +60,20 @@
         </div>
 
         <div class="metric-card metric-jitter">
+          <div class="tooltip">
+            <strong class="tooltip-title">Jitter</strong><br />
+            <span class="metric-description"
+              >Variation in latency over time. Measures how stable and
+              consistent your connection is.</span
+            ><br /><br />
+            <strong class="tooltip-title">Ranges:</strong><br />
+            <span class="range excellent">&lt;5ms: Excellent</span><br />
+            <span class="range good">5-20ms: Good</span><br />
+            <span class="range fair">20-50ms: Fair</span><br />
+            <span class="range poor">>50ms: Poor</span><br /><br />
+            Lower jitter means more stable connections, especially important for
+            real-time applications.
+          </div>
           <div class="metric-header">
             <span class="metric-title">Jitter</span>
             <span class="metric-avg">avg: --</span>
@@ -36,6 +85,19 @@
         </div>
 
         <div class="metric-card metric-packetloss">
+          <div class="tooltip">
+            <strong class="tooltip-title">Packet Loss</strong><br />
+            <span class="metric-description"
+              >Percentage of data packets that fail to reach their
+              destination.</span
+            ><br /><br />
+            <strong class="tooltip-title">Ranges:</strong><br />
+            <span class="range excellent">0%: Excellent</span><br />
+            <span class="range good">0-1%: Good</span><br />
+            <span class="range fair">1-5%: Fair</span><br />
+            <span class="range poor">>5%: Poor</span><br /><br />
+            Lower packet loss indicates more reliable data transmission.
+          </div>
           <div class="metric-header">
             <span class="metric-title">Packet Loss</span>
             <span class="metric-avg">avg: --</span>
@@ -45,6 +107,95 @@
             <span class="metric-unit">%</span>
           </div>
         </div>
+
+        <div class="metric-card metric-quality">
+          <div class="quality-border"></div>
+          <div class="tooltip">
+            <div class="tooltip-section">
+              <span class="tooltip-title">Quality Score (0-100)</span><br />
+              <span class="metric-description"
+                >A comprehensive score that evaluates your overall network
+                performance.</span
+              >
+
+              <div class="tooltip-content-wrapper">
+                <!-- Components section -->
+                <div class="tooltip-components">
+                  <div class="section-title">Components</div>
+
+                  <!-- Current Latency -->
+                  <div class="metric-item">
+                    <div class="metric-header">
+                      <span class="metric-name">Current Latency</span>
+                      <span class="weight excellent">25%</span>
+                    </div>
+                    <span class="metric-description"
+                      >How fast your connection is right now</span
+                    >
+                  </div>
+
+                  <!-- Historical Performance -->
+                  <div class="metric-item">
+                    <div class="metric-header">
+                      <span class="metric-name">Historical Performance</span>
+                      <span class="weight excellent">25%</span>
+                    </div>
+                    <span class="metric-description"
+                      >Average latency over the last hour</span
+                    >
+                  </div>
+
+                  <!-- Spike Analysis -->
+                  <div class="metric-item">
+                    <div class="metric-header">
+                      <span class="metric-name">Spike Analysis</span>
+                      <span class="weight excellent">30%</span>
+                    </div>
+                    <span class="metric-description"
+                      >Impact of latency spikes (small: 0-20ms, medium: 20-50ms,
+                      large: >50ms)</span
+                    >
+                  </div>
+
+                  <!-- Packet Loss -->
+                  <div class="metric-item">
+                    <div class="metric-header">
+                      <span class="metric-name">Packet Loss</span>
+                      <span class="weight good">20%</span>
+                    </div>
+                    <span class="metric-description"
+                      >Weighted average of recent and historical packet
+                      loss</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Ranges section -->
+                <div class="tooltip-ranges">
+                  <div class="section-title">Score Ranges</div>
+                  <div class="ranges-grid">
+                    <span class="range excellent">≥90: Excellent</span>
+                    <span class="range good">≥70: Good</span>
+                    <span class="range fair">≥50: Fair</span>
+                    <span class="range poor">&lt;50: Poor</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-header">
+            <span class="metric-title">
+              Quality Score
+              <span class="quality-indicator"></span>
+            </span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="qualityScore">0</span>
+            <span class="metric-unit"></span>
+          </div>
+        </div>
       </div>
 
       <div class="dashboard-grid">
@@ -52,9 +203,42 @@
           <canvas id="latencyGraph"></canvas>
         </div>
         <div class="spikes-container">
-          <h2>Last Spikes</h2>
+          <h2>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#e76f51"
+              stroke-width="2"
+            >
+              <path d="M12 2L2 19h20L12 2z" />
+              <path d="M12 16v-5" />
+              <path d="M12 19v-.01" />
+            </svg>
+            Last Spikes
+          </h2>
           <div id="lastSpikesCards">
             <!-- Spike cards will be dynamically added here -->
+          </div>
+        </div>
+        <div class="trends-container">
+          <h2>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ffd700"
+              stroke-width="2"
+            >
+              <path d="M23 6l-9.5 9.5-5-5L1 18" />
+              <path d="M17 6h6v6" />
+            </svg>
+            Recent Increases
+          </h2>
+          <div id="latencyTrends">
+            <!-- Trend cards will be dynamically added here -->
           </div>
         </div>
       </div>
@@ -78,7 +262,6 @@
       </button>
     </div>
 
-    <script src="eel.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
   </body>
@@ -87,7 +270,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Settings</h2>
-        <button id="closeSettings" class="close-button">&times;</button>
+        <button id="closeSettings" class="settings-close-button">
+          &times;
+        </button>
       </div>
       <div class="modal-body">
         <div class="setting-item">
@@ -102,7 +287,10 @@
           />
         </div>
         <div class="setting-actions">
-          <button id="saveSettings" class="save-button">Save</button>
+          <button id="saveSettings" class="save-button">
+            <span class="button-text">Save</span>
+            <div class="spinner hidden"></div>
+          </button>
         </div>
       </div>
     </div>

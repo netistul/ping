@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Monitor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #202020;
+            color: #e0e0e0;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        #custom-titlebar {
+            height: 32px;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: default;
+            border-bottom: 1px solid #333;
+        }
+        
+        #drag-region {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #window-title {
+            margin-left: 12px;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        #window-controls {
+            display: flex;
+            height: 100%;
+        }
+        
+        .window-control-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 46px;
+            height: 100%;
+            transition: background-color 0.1s;
+        }
+        
+        .window-control-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        #min-button:hover {
+            background-color: #404040;
+        }
+        
+        #max-button:hover {
+            background-color: #404040;
+        }
+        
+        #close-button:hover {
+            background-color: #E81123;
+        }
+        
+        #app-content {
+            height: calc(100vh - 32px);
+            overflow: auto;
+            padding: 10px;
+        }
+        
+        /* SVG icons for the buttons */
+        .window-control-icon {
+            fill: none;
+            stroke: white;
+            stroke-width: 1;
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+    <!-- Import original script files -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script src="script.js"></script>
+</head>
+<body>
+    <!-- Custom title bar -->
+    <div id="custom-titlebar">
+        <div id="drag-region">
+            <div id="window-title">Network Monitor</div>
+        </div>
+        <div id="window-controls">
+            <div class="window-control-button" id="min-button" onclick="minimizeWindow()">
+                <svg class="window-control-icon" viewBox="0 0 10 1">
+                    <rect width="10" height="1" stroke="white" fill="white"></rect>
+                </svg>
+            </div>
+            <div class="window-control-button" id="max-button" onclick="maximizeWindow()">
+                <svg class="window-control-icon" viewBox="0 0 10 10">
+                    <rect width="10" height="10" stroke="white" fill="none"></rect>
+                </svg>
+            </div>
+            <div class="window-control-button" id="close-button" onclick="closeWindow()">
+                <svg class="window-control-icon" viewBox="0 0 10 10">
+                    <line x1="0" y1="0" x2="10" y2="10" stroke="white"></line>
+                    <line x1="10" y1="0" x2="0" y2="10" stroke="white"></line>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main app content -->
+    <div id="app-content">
+        
+    <div class="container">
+      <div class="header">
+        <h1>Network Monitor</h1>
+      </div>
+
+      <div class="monitoring-status">
+        <div class="status-dot"></div>
+        <span id="elapsed-time">just started</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card metric-latency">
+          <div class="tooltip">
+            <strong class="tooltip-title">Latency (Ping)</strong>
+            Measures the time it takes for data to travel from your device to
+            the server and back.<br /><br />
+            <strong class="tooltip-title">Ranges:</strong>
+            <span class="range excellent">&lt;20ms: Excellent</span><br />
+            <span class="range good">20-100ms: Good</span><br />
+            <span class="range fair">100-200ms: Fair</span><br />
+            <span class="range poor">>200ms: Poor</span><br /><br />
+            Lower values indicate better network performance.
+          </div>
+          <div class="metric-header">
+            <span class="metric-title">Latency</span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="latency">0</span>
+            <span class="metric-unit">ms</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-jitter">
+          <div class="tooltip">
+            <strong class="tooltip-title">Jitter</strong>
+            Variation in latency over time. Measures how stable and consistent
+            your connection is.<br /><br />
+            <strong class="tooltip-title">Ranges:</strong>
+            <span class="range excellent">&lt;5ms: Excellent</span><br />
+            <span class="range good">5-20ms: Good</span><br />
+            <span class="range fair">20-50ms: Fair</span><br />
+            <span class="range poor">>50ms: Poor</span><br /><br />
+            Lower jitter means more stable connections, especially important for
+            real-time applications.
+          </div>
+          <div class="metric-header">
+            <span class="metric-title">Jitter</span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="jitter">0</span>
+            <span class="metric-unit">ms</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-packetloss">
+          <div class="tooltip">
+            <strong class="tooltip-title">Packet Loss</strong>
+            Percentage of data packets that fail to reach their destination.<br /><br />
+            <strong class="tooltip-title">Ranges:</strong>
+            <span class="range excellent">0%: Excellent</span><br />
+            <span class="range good">0-1%: Good</span><br />
+            <span class="range fair">1-5%: Fair</span><br />
+            <span class="range poor">>5%: Poor</span><br /><br />
+            Lower packet loss indicates more reliable data transmission.
+          </div>
+          <div class="metric-header">
+            <span class="metric-title">Packet Loss</span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="packetLoss">0</span>
+            <span class="metric-unit">%</span>
+          </div>
+        </div>
+
+        <div class="metric-card metric-quality">
+          <div class="quality-border"></div>
+          <div class="tooltip">
+            <strong class="tooltip-title"
+              >Quality Score (0-100) combines:</strong
+            >
+            • <span class="metric-name">Latency</span>
+            <span class="weight excellent">(35%)</span>:<br />
+            &lt;20ms excellent, >200ms poor<br />
+            • <span class="metric-name">Jitter</span>
+            <span class="weight excellent">(35%)</span>:<br />
+            &lt;5ms excellent, >50ms poor<br />
+            • <span class="metric-name">Packet Loss</span>
+            <span class="weight good">(30%)</span>:<br />
+            0% excellent, >5% poor<br />
+            <strong class="tooltip-title">Score ranges:</strong>
+            <span class="range excellent">≥90: Excellent</span><br />
+            <span class="range good">≥70: Good</span><br />
+            <span class="range fair">≥50: Fair</span><br />
+            <span class="range poor">&lt;50: Poor</span>
+          </div>
+
+          <div class="metric-header">
+            <span class="metric-title">
+              Quality Score
+              <span class="quality-indicator"></span>
+            </span>
+            <span class="metric-avg">avg: --</span>
+          </div>
+          <div class="metric-values">
+            <span class="metric-value" id="qualityScore">0</span>
+            <span class="metric-unit"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="graph-container">
+          <canvas id="latencyGraph"></canvas>
+        </div>
+        <div class="spikes-container">
+          <h2>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#e76f51"
+              stroke-width="2"
+            >
+              <path d="M12 2L2 19h20L12 2z" />
+              <path d="M12 16v-5" />
+              <path d="M12 19v-.01" />
+            </svg>
+            Last Spikes
+          </h2>
+          <div id="lastSpikesCards">
+            <!-- Spike cards will be dynamically added here -->
+          </div>
+        </div>
+        <div class="trends-container">
+          <h2>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ffd700"
+              stroke-width="2"
+            >
+              <path d="M23 6l-9.5 9.5-5-5L1 18" />
+              <path d="M17 6h6v6" />
+            </svg>
+            Recent Increases
+          </h2>
+          <div id="latencyTrends">
+            <!-- Trend cards will be dynamically added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-button">
+      <button id="openSettings" class="macos-button">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+  
+    </div>
+    
+    <script>
+        // Add window control functions
+        function minimizeWindow() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.minimize_window();
+            }
+        }
+        
+        function maximizeWindow() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.maximize_window();
+            }
+        }
+        
+        function closeWindow() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.close_window();
+            }
+        }
+        
+        // Make the titlebar simulate dragging by moving the window position
+        let isDragging = false;
+        let dragStartX, dragStartY;
+        
+        document.getElementById('drag-region').addEventListener('mousedown', function(e) {
+            // Prevent clicks on buttons from triggering drag
+            if (e.target.closest('.window-control-button')) return;
+            
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            
+            // Signal to pywebview that we're starting a drag operation
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.drag_window();
+            }
+            
+            // Add mousemove and mouseup event listeners to document
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            
+            // Prevent default text selection during drag
+            e.preventDefault();
+        });
+        
+        function handleMouseMove(e) {
+            // We can't directly handle the window drag in pywebview 5.4
+            // This is mostly a visual indicator that dragging is happening
+            if (isDragging) {
+                document.body.style.cursor = 'move';
+            }
+        }
+        
+        function handleMouseUp(e) {
+            isDragging = false;
+            document.body.style.cursor = 'default';
+            
+            // Remove the event listeners
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        // Original onload handler for compatibility
+        let originalOnload = window.onload;
+        window.onload = function() {
+            // Call original onload if it exists
+            if (typeof originalOnload === 'function') {
+                originalOnload();
+            }
+            
+            // Signal JS is ready
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.js_ready();
+            }
+        };
+    </script>
+</body>
+</html>
+        
