@@ -17,12 +17,6 @@ https://github.com/user-attachments/assets/44e65004-241b-4638-b2cc-757f4f0bcac3
 
 
 
-## Why Use Ping?
-Ping gives you the information you need to make informed decisions about when to play online games that require a stable connection. By monitoring your connection before starting a match, you can avoid the frustration of lag spikes during critical gaming moments.
-
-## Advice for Best Results
-Test your internet connection both with WiFi and with a wired ethernet connection. You'll likely see a significant difference, especially if you live in an area with many WiFi networks!
-
 ## Installation
 
 ### Windows
