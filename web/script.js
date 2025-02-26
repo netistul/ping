@@ -11,7 +11,7 @@ let jitterValues = [];
 let packetLossValues = [];
 const maxHistoryLength = 100;
 
-let updateInterval = 200;
+let updateInterval = 500;
 let updateIntervalId = null;
 let interpolationIntervalId = null;
 let spikeHistoryIntervalId = null;
